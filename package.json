@@ -1,0 +1,11 @@
+{
+  "name": "n9btz-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "THE N9 & BTZ — static site + Vercel serverless functions (admin panel, database, photo upload).",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@vercel/blob": "^2.8.0",
+    "cookie": "^0.7.2"
+  }
+}

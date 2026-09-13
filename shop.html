@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shop — THE N9 &amp; BTZ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Libre+Franklin:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <main class="shop-page-static">
+    <div class="shop-page-nav">
+      <a href="/#shop" class="shop-page-back">← Back to shop</a>
+    </div>
+
+    <div class="shop-page-hero">
+      <span class="shop-page-eyebrow">THE N9 &amp; BTZ — Shop</span>
+      <h1 id="category-title">Loading…</h1>
+    </div>
+
+    <p id="db-error" class="loading-note" style="display:none;">Catalogue not reachable right now. Try again shortly.</p>
+
+    <div class="shop-page-cols">
+      <div class="shop-page-col">
+        <h2>Men</h2>
+        <ul id="men-list"></ul>
+        <p id="men-empty" class="shop-page-empty" style="display:none;">No items yet.</p>
+      </div>
+      <div class="shop-page-col">
+        <h2>Women</h2>
+        <ul id="women-list"></ul>
+        <p id="women-empty" class="shop-page-empty" style="display:none;">No items yet.</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="/js/shop.js"></script>
+</body>
+</html>

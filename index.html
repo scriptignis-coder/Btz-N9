@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin login — THE N9 &amp; BTZ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Libre+Franklin:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <main class="auth-shell">
+    <form class="auth-card" id="login-form">
+      <span class="eyebrow">THE N9 &amp; BTZ</span>
+      <h1>Admin sign in</h1>
+      <p class="auth-note">Staff only — manage stock, prices and promos.</p>
+
+      <p class="auth-error" id="login-error" style="display:none;"></p>
+
+      <label class="field">
+        <span>Username</span>
+        <input id="username" name="username" type="text" autocomplete="username" required>
+      </label>
+      <label class="field">
+        <span>Password</span>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </label>
+
+      <button type="submit" class="btn-solid" id="login-submit">Sign in</button>
+    </form>
+  </main>
+
+  <script src="/js/admin-login.js"></script>
+</body>
+</html>
