@@ -4,7 +4,7 @@ function client() {
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
-      'DATABASE_URL is not set. Add a Postgres/Neon database in Vercel and connect it to this project.'
+      'DATABASE_URL is not set. Create a free database at neon.tech and add its connection string as an environment variable.'
     );
   }
   return neon(url);

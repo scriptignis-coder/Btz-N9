@@ -1,4 +1,4 @@
-const { put } = require('@vercel/blob');
+const { uploadPhoto } = require('./_lib/storage');
 const { requireAdmin } = require('./_lib/auth');
 const { CATEGORY_IDS, getAllProducts, getProductsByCategory, insertProduct } = require('./_lib/db');
 
@@ -53,19 +53,13 @@ module.exports = async (req, res) => {
 
     let photoUrl = null;
     if (body.photoBase64) {
+      const buffer = Buffer.from(body.photoBase64, 'base64');
+      if (buffer.length > 4 * 1024 * 1024) {
+        res.status(400).json({ error: 'Photo is too large — keep it under 4 MB.' });
+        return;
+      }
       try {
-        const buffer = Buffer.from(body.photoBase64, 'base64');
-        if (buffer.length > 4 * 1024 * 1024) {
-          res.status(400).json({ error: 'Photo is too large — keep it under 4 MB.' });
-          return;
-        }
-        const ext = (body.photoName || 'photo.jpg').split('.').pop();
-        const blob = await put(`products/${Date.now()}.${ext}`, buffer, {
-          access: 'public',
-          contentType: body.photoContentType || 'image/jpeg',
-          addRandomSuffix: true,
-        });
-        photoUrl = blob.url;
+        photoUrl = await uploadPhoto(body.photoBase64, body.photoContentType || 'image/jpeg');
       } catch (err) {
         res.status(500).json({ error: 'upload_failed', message: err.message });
         return;

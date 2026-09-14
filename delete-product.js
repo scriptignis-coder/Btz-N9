@@ -1,4 +1,4 @@
-const { del } = require('@vercel/blob');
+const { deletePhoto } = require('./_lib/storage');
 const { requireAdmin } = require('./_lib/auth');
 const { deleteProduct, getProduct } = require('./_lib/db');
 
@@ -20,9 +20,9 @@ module.exports = async (req, res) => {
     const product = await deleteProduct(id);
     if (existing?.photo_url) {
       try {
-        await del(existing.photo_url);
+        await deletePhoto(existing.photo_url);
       } catch {
-        // best-effort cleanup — the DB row is already gone, ignore blob errors
+        // best-effort cleanup — the DB row is already gone, ignore storage errors
       }
     }
     res.status(200).json({ product });
