@@ -26,6 +26,14 @@
   box-sizing: border-box;
 }
 
+/* The hidden attribute must always win, even over a class that sets its
+   own `display` (e.g. `.result-overlay { display: flex }` toggled via
+   `el.hidden = true` in JS) — without this, an element with explicit
+   `display` styling stays visible/interactive despite `hidden`. */
+[hidden] {
+  display: none !important;
+}
+
 html,
 body {
   height: 100%;
@@ -1994,4 +2002,326 @@ section {
   border-radius: 4px;
   background: linear-gradient(90deg, var(--accent-2), var(--accent));
   transition: width 0.5s ease;
+}
+
+/* ---------- Game Play teaser (home page) ---------- */
+
+.gameplay-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  background: linear-gradient(160deg, var(--surface), var(--bg-elevated));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.gameplay-card-info h3 {
+  margin: 0 0 8px;
+  font-size: 1.3rem;
+}
+
+.gameplay-card-info p {
+  margin: 0;
+  max-width: 56ch;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+/* ---------- Chkobba game page ---------- */
+
+.game-hero {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 56px 24px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.game-hero h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin: 0;
+}
+
+.game-hero-sub {
+  color: var(--text-muted);
+  font-size: 0.96rem;
+  max-width: 46ch;
+  margin: 0;
+}
+
+.game-gate {
+  max-width: 460px;
+  margin: 0 auto 60px;
+  padding: 32px 26px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.game-gate p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.game-area {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+
+.game-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.game-player-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.game-player-tag b {
+  color: var(--accent-strong);
+}
+
+.game-logout {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  text-decoration: none;
+}
+
+.game-logout:hover {
+  color: var(--accent);
+}
+
+.chkobba-board {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 24px;
+  background: linear-gradient(160deg, var(--bg-elevated), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.chkobba-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.player-side {
+  align-items: center;
+}
+
+.ai-side {
+  align-items: center;
+}
+
+.chkobba-side-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.chkobba-side-label b {
+  color: var(--accent-strong);
+}
+
+#turn-indicator {
+  color: var(--accent);
+}
+
+.chkobba-hand {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 88px;
+}
+
+.chkobba-pile-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.chkobba-table-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.chkobba-table {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  min-height: 88px;
+  align-items: center;
+}
+
+.chkobba-table-empty {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  color: var(--text-faint);
+}
+
+.chkobba-deck-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+}
+
+.card {
+  position: relative;
+  width: 54px;
+  height: 78px;
+  flex: 0 0 auto;
+  background: #f5f1e6;
+  border: 1px solid color-mix(in srgb, var(--bg) 30%, transparent);
+  border-radius: 5px;
+  box-shadow: 0 3px 8px var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #14120e;
+  font-family: 'Libre Franklin', sans-serif;
+}
+
+.card.red {
+  color: #a8332a;
+}
+
+.card-corner {
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.card-suit {
+  font-size: 1.5rem;
+}
+
+.card-back {
+  background: repeating-linear-gradient(
+    135deg,
+    var(--accent-2) 0px,
+    var(--accent-2) 4px,
+    var(--accent-2-strong) 4px,
+    var(--accent-2-strong) 8px
+  );
+  border-color: var(--border-strong);
+}
+
+.card.is-clickable {
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card.is-clickable:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px var(--shadow);
+}
+
+.game-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.result-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.result-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 28px 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 20px 50px var(--shadow);
+}
+
+.result-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 1.6rem;
+}
+
+.result-breakdown {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.result-total {
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 700;
+}
+
+@media (max-width: 620px) {
+  .card {
+    width: 42px;
+    height: 62px;
+  }
+
+  .card-suit {
+    font-size: 1.15rem;
+  }
 }

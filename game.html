@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chkobba — THE N9 &amp; BTZ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Libre+Franklin:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <main class="shop-page-static">
+    <div class="shop-page-nav">
+      <a href="/#gameplay" class="shop-page-back">← Back home</a>
+    </div>
+
+    <div class="game-hero">
+      <span class="shop-page-eyebrow">THE N9 &amp; BTZ — Game Play</span>
+      <h1>Chkobba</h1>
+      <p class="game-hero-sub">Play a hand of Chkobba against the computer. Win to climb the leaderboard under your real Kick name.</p>
+    </div>
+
+    <!-- Shown when nobody is logged in yet -->
+    <div id="login-gate" class="game-gate" hidden>
+      <p id="login-gate-msg">Login with your Kick account to play and get on the leaderboard.</p>
+      <a href="/api/kick-login" class="btn-solid pulse">Login with Kick</a>
+    </div>
+
+    <!-- The actual game — shown once logged in -->
+    <div id="game-area" class="game-area" hidden>
+      <div class="game-topbar">
+        <span class="game-player-tag">Playing as <b id="player-name"></b></span>
+        <a href="/api/player-logout" class="game-logout">Log out</a>
+      </div>
+
+      <div class="chkobba-board">
+        <div class="chkobba-side ai-side">
+          <div class="chkobba-side-label">Computer</div>
+          <div class="chkobba-hand" id="ai-hand"></div>
+          <div class="chkobba-pile-info">Captured: <span id="ai-captured-count">0</span> · Scopas: <span id="ai-scopa-count">0</span></div>
+        </div>
+
+        <div class="chkobba-table-wrap">
+          <div class="chkobba-table" id="table-cards"></div>
+          <div class="chkobba-deck-info"><span id="deck-count">0</span> cards left in the deck</div>
+        </div>
+
+        <div class="chkobba-side player-side">
+          <div class="chkobba-pile-info">Captured: <span id="player-captured-count">0</span> · Scopas: <span id="player-scopa-count">0</span></div>
+          <div class="chkobba-hand" id="player-hand"></div>
+          <div class="chkobba-side-label">You — <span id="turn-indicator">your turn</span></div>
+        </div>
+      </div>
+
+      <div class="game-controls">
+        <button type="button" id="new-round-btn" class="btn-ghost">New round</button>
+      </div>
+    </div>
+
+    <!-- Result overlay -->
+    <div id="result-overlay" class="result-overlay" hidden>
+      <div class="result-card">
+        <span id="result-title" class="result-title">You win!</span>
+        <div id="result-breakdown" class="result-breakdown"></div>
+        <button type="button" id="play-again-btn" class="btn-solid">Play again</button>
+      </div>
+    </div>
+
+    <div class="stat-bars-card">
+      <div class="stat-bars-head">
+        <span class="stat-bars-title">Top players</span>
+        <span class="stat-bars-sub">Most wins — all time</span>
+      </div>
+      <div id="leaderboard-list" class="chatters-list" hidden></div>
+      <p id="leaderboard-empty" class="chatters-empty">Loading…</p>
+    </div>
+  </main>
+
+  <script src="/chkobba.js"></script>
+  <script src="/game.js"></script>
+</body>
+</html>

@@ -12,6 +12,9 @@ const file = (name) => path.join(DIR, name);
 require('./db')
   .ensureGiftEventsTable()
   .catch((err) => console.error('gift_events table check failed:', err.message));
+require('./db')
+  .ensureChkobbaWinsTable()
+  .catch((err) => console.error('chkobba_wins table check failed:', err.message));
 
 // Start listening to the public Kick chat feed for both streamers so the
 // Top Chatters and Top Gifters leaderboards are always tracking in the
@@ -31,6 +34,12 @@ app.all('/api/delete-product', require('./delete-product'));
 app.get('/api/kick-status', require('./kick-status'));
 app.get('/api/top-chatters', require('./top-chatters'));
 app.get('/api/top-gifters', require('./top-gifters'));
+app.get('/api/kick-login', require('./kick-login'));
+app.get('/api/kick-oauth-callback', require('./kick-oauth-callback'));
+app.get('/api/player-session', require('./player-session'));
+app.all('/api/player-logout', require('./player-logout'));
+app.get('/api/chkobba-leaderboard', require('./chkobba-leaderboard'));
+app.all('/api/chkobba-report-win', require('./chkobba-report-win'));
 
 // ---------- Pages (every project file is flat in this folder, so each public page
 // is served explicitly by name — this also keeps server-side files like server.js,
@@ -38,6 +47,7 @@ app.get('/api/top-gifters', require('./top-gifters'));
 app.get('/', (req, res) => res.sendFile(file('home.html')));
 app.get('/shop/:category', (req, res) => res.sendFile(file('shop.html')));
 app.get('/stats/:streamer', (req, res) => res.sendFile(file('stats.html')));
+app.get('/game', (req, res) => res.sendFile(file('game.html')));
 app.get('/admin', (req, res) => res.sendFile(file('admin.html')));
 app.get('/admin/login', (req, res) => res.sendFile(file('admin-login.html')));
 
@@ -47,6 +57,8 @@ const STATIC_FILES = [
   'styles.css',
   'shop.js',
   'stats.js',
+  'chkobba.js',
+  'game.js',
   'admin.js',
   'admin-login.js',
   'effects.js',

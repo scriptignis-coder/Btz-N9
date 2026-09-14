@@ -111,6 +111,45 @@ async function topGifters(streamer, days, limit) {
   `;
 }
 
+// ---------- Chkobba "who's the best" leaderboard ----------
+// One row per Kick account that has ever played and won at least once —
+// wins are only recorded for someone who actually logged in with Kick
+// (player-auth.js), so the name on the board is their real Kick username.
+
+async function ensureChkobbaWinsTable() {
+  const sql = client();
+  await sql`
+    CREATE TABLE IF NOT EXISTS chkobba_wins (
+      kick_user_id  TEXT PRIMARY KEY,
+      username      TEXT NOT NULL,
+      wins          INTEGER NOT NULL DEFAULT 0,
+      updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+}
+
+async function recordChkobbaWin({ kickUserId, username }) {
+  const sql = client();
+  const rows = await sql`
+    INSERT INTO chkobba_wins (kick_user_id, username, wins, updated_at)
+    VALUES (${kickUserId}, ${username}, 1, now())
+    ON CONFLICT (kick_user_id)
+    DO UPDATE SET wins = chkobba_wins.wins + 1, username = ${username}, updated_at = now()
+    RETURNING *
+  `;
+  return rows[0];
+}
+
+async function chkobbaLeaderboard(limit) {
+  const sql = client();
+  return sql`
+    SELECT username, wins
+    FROM chkobba_wins
+    ORDER BY wins DESC, updated_at ASC
+    LIMIT ${limit}
+  `;
+}
+
 module.exports = {
   CATEGORIES,
   CATEGORY_IDS,
@@ -124,4 +163,7 @@ module.exports = {
   ensureGiftEventsTable,
   recordGift,
   topGifters,
+  ensureChkobbaWinsTable,
+  recordChkobbaWin,
+  chkobbaLeaderboard,
 };

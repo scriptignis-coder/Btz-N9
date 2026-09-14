@@ -109,7 +109,41 @@ Nav → **Stream Stats** → pick ZaNouNi or B_b10 → opens `/stats/zanouni` or
   chatter counts reset when that happens (same as a real "new live
   session" reset). On a paid Render plan (always-on) this wouldn't happen.
 
-## 5. Using the site
+## 5. Game Play — Chkobba (needs one extra setup step)
+
+Nav → the new **Game Play** section on the home page (before "Behind the
+scenes") → **Play now** → `/game`. A visitor logs in with their own Kick
+account, plays a hand of Chkobba (the Tunisian card game) against the
+computer, and a win puts them on the "Top players" leaderboard under their
+real Kick username.
+
+This needs a real "Login with Kick" flow — genuinely different from
+everything else on the site, since it's the first feature where a random
+visitor authorizes the app with their own account (not you, not ZaNouNi/B_b10).
+Kick's own official login system handles it; two things to set up once:
+
+1. **On Kick**: go back into the same Developer App you already created for
+   the live-status badge (Account Settings → Developer → your app → edit).
+   - Turn on the **`user:read`** permission (it was off — you only needed
+     "Read channel info" before).
+   - Add a **Redirect URI**: `https://your-site.onrender.com/api/kick-oauth-callback`
+     (use your actual Render URL — same domain as the site, just with that
+     path at the end).
+2. **In Render → your service → Environment**, add one more variable:
+
+   | Key | Value |
+   | --- | --- |
+   | `SITE_URL` | `https://your-site.onrender.com` (your exact Render URL, no trailing slash) |
+
+Redeploy after that. Nothing else needed — the leaderboard's database table
+creates itself automatically the same way the gifters one does.
+
+One honest caveat: like the follower badge and Top Chatters, this relies on
+things staying exactly as Kick has them documented today — if Kick changes
+their login system, "Login with Kick" would just stop working until it's
+updated; nothing else on the site would be affected.
+
+## 6. Using the site
 
 - `your-site.onrender.com/` — public site
 - `your-site.onrender.com/admin` — admin panel (login with the
@@ -119,7 +153,7 @@ Nav → **Stream Stats** → pick ZaNouNi or B_b10 → opens `/stats/zanouni` or
   ~~200 DT~~ **50 DT**), a photo (max 4 MB), in-stock checkbox.
 - Toggle stock, edit promo price, or delete any product any time.
 
-## 6. Editing the site later
+## 7. Editing the site later
 
 Every page is a plain `.html` file you can open and edit directly:
 
@@ -127,6 +161,8 @@ Every page is a plain `.html` file you can open and edit directly:
 - `shop.html` — the shop category page template
 - `stats.html` — the Stream Stats page template (`stats.js` holds the
   per-streamer Peak viewers / Hours live / Streak numbers to hand-edit)
+- `game.html` — the Chkobba game page (`chkobba.js` is the game engine,
+  `game.js` wires it to the screen)
 - `admin.html` / `admin-login.html` — the admin panel and its login page
 - `styles.css` — every color and font, as CSS variables at the very top
 
