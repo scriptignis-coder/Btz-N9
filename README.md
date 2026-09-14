@@ -37,50 +37,54 @@ You already have these values from Neon and Cloudinary:
 
 Build Command: `npm install` — Start Command: `npm start`.
 
-## 3. Real follower counts, hours, streak (manual)
+## 3. Real "LIVE — n watching" badge + real follower counts (automatic)
 
-Kick's own API doesn't expose follower count, peak viewers, hours-live or
-streak for any channel at all — checked directly against their spec, it
-just isn't there. So those numbers are meant to be typed in by hand and
-kept up to date whenever you want, in `home.html`:
+Two different data sources power this, on purpose:
 
-- Each streamer's `<div class="stat-row">` has 4 numbers: Followers, Peak
-  viewers, Hours live (30d), Streak — just edit the number inside the
-  matching `<div class="stat-value">…</div>`.
-- The `<div class="combined-bar">` near the bottom of the Roster section
-  has the 3 shared numbers (combined followers, joint streams, longest
-  co-stream) the same way.
+- **Live status + live viewer count** comes from Kick's **official**
+  Developer API — stable, supported by Kick. Needs a free Kick developer
+  app:
 
-Edit, save, re-upload that one file to GitHub (or just edit it directly
-in GitHub's web editor — pencil icon on the file) and Render redeploys
-automatically.
+  1. On Kick: **Account Settings → Security** and turn on **2FA**
+     (required before the Developer tab unlocks).
+  2. **Account Settings → Developer → Create an app**. Fill in any name
+     (letters/numbers only, no spaces or `&`), a real description (10+
+     characters), and any redirect URL (e.g. `https://example.com` — it's
+     never actually used, this app only reads public data). Under
+     permissions, you only need **"Read channel info"** — you can uncheck
+     the rest (streaming key, ads, moderation, chat). Creating it gives
+     you a **Client ID** and **Client Secret**.
+  3. In Render → your service → Environment, add:
 
-## 4. Real "LIVE — n watching" badge (optional, automatic)
+     | Key | Value |
+     | --- | --- |
+     | `KICK_CLIENT_ID` | from step 2 |
+     | `KICK_CLIENT_SECRET` | from step 2 |
 
-The one thing Kick's API *does* give for free is live/offline status and
-the real live viewer count while a stream is live — the site shows this
-as a small badge next to each streamer's name, automatically, once you
-connect it:
+- **Follower counts** are NOT available through Kick's official API at
+  all — checked directly against their spec, it just isn't exposed. So
+  this instead calls the same public endpoint kick.com's own website
+  uses (`kick.com/api/v2/channels/{slug}`). This is **not an official,
+  supported API** — Kick could change or block it at any time without
+  notice — but it's the only way to get real follower numbers
+  automatically. If it ever stops working, the follower numbers on the
+  site just stay frozen at their last known value; nothing else breaks.
 
-1. On Kick: **Account Settings → Security** and turn on **2FA** (required
-   before the Developer tab unlocks).
-2. **Account Settings → Developer → Create an app**. It gives you a
-   **Client ID** and **Client Secret** — copy both (the redirect URL
-   field can be anything, e.g. `https://example.com`, since this site
-   only uses the app for public data, not sign-in).
-3. In Render → your service → Environment, add two more variables:
+Redeploy after adding the env vars above. The badge next to ZaNouNi's and
+B_b10's names, and the Followers numbers (including "Combined
+followers"), will start updating for real, refreshing every 45 seconds —
+until then they just stay as their placeholder numbers, the rest of the
+site is unaffected.
 
-   | Key | Value |
-   | --- | --- |
-   | `KICK_CLIENT_ID` | from step 2 |
-   | `KICK_CLIENT_SECRET` | from step 2 |
+**Peak viewers, Hours live (30d) and Streak** genuinely aren't available
+anywhere (Kick doesn't track/expose that history at all) — those 6
+numbers stay manually typed in `home.html`, in each streamer's
+`<div class="stat-row">` — edit the number inside the matching
+`<div class="stat-value">…</div>` whenever you want to update them, and
+re-upload (or edit directly in GitHub's web editor — pencil icon on the
+file).
 
-4. Redeploy. The badge next to ZaNouNi's and B_b10's names will start
-   showing "Live — n watching" or "Offline" for real, refreshing every
-   45 seconds — until then it just stays hidden, the rest of the site is
-   unaffected.
-
-## 5. Using the site
+## 4. Using the site
 
 - `your-site.onrender.com/` — public site
 - `your-site.onrender.com/admin` — admin panel (login with the
@@ -90,7 +94,7 @@ connect it:
   ~~200 DT~~ **50 DT**), a photo (max 4 MB), in-stock checkbox.
 - Toggle stock, edit promo price, or delete any product any time.
 
-## 6. Editing the site later
+## 5. Editing the site later
 
 Every page is a plain `.html` file you can open and edit directly:
 
