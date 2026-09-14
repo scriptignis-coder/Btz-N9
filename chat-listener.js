@@ -108,10 +108,23 @@ function connectChat(slug) {
       return;
     }
 
-    if (msg.event === 'App\\Events\\GiftedSubscriptionsEvent') {
+    if (
+      msg.event === 'App\\Events\\GiftedSubscriptionsEvent' ||
+      msg.event === 'App\\Events\\GiftsLeaderboardUpdated' ||
+      msg.event === 'App\\Events\\SubscriptionEvent'
+    ) {
       let payload;
       try { payload = JSON.parse(msg.data); } catch (_) { return; }
+      console.log('[chat-listener]', slug, msg.event, JSON.stringify(payload).slice(0, 500));
       handleGift(slug, payload);
+      return;
+    }
+
+    // Anything else we don't recognize yet — log it (truncated) so a real
+    // gift/sub moment caught here in production tells us the exact event
+    // name and field shape Kick actually uses, instead of guessing blind.
+    if (msg.event && msg.event.indexOf('pusher:') !== 0) {
+      console.log('[chat-listener]', slug, 'unhandled event:', msg.event, String(msg.data).slice(0, 300));
     }
   });
 

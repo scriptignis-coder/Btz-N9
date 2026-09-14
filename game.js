@@ -9,8 +9,20 @@
   var aiScopas = 0;
   var lastCapturer = null;
   var turn = 'player';
-  var gameOver = false;
+  var gameOver = false; // true once the current HAND has no more moves left
   var currentPlayer = null;
+
+  // Real Chkobba (chkobbeta.tn's system, same as it's actually played) isn't
+  // decided by one hand — hands keep getting dealt and scored until someone's
+  // running total reaches Chkobba.MATCH_TARGET (21). matchScore accumulates
+  // across hands; only once the MATCH is decided do we report a win and show
+  // the final "you win" screen.
+  var matchScore = { player: 0, ai: 0 };
+  var pendingNextHand = false; // true while the overlay on screen is a "hand won" notice, not the final match result
+  var autoAdvanceTimer = null;
+
+  var musicEl = null;
+  var musicStarted = false;
 
   function fmt(n) {
     return Number(n).toLocaleString();
@@ -20,6 +32,24 @@
     return String(str).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
+  }
+
+  // Browsers block audio-with-sound until a real user gesture happens on the
+  // page. We call this from every button click in the game (New match, Next
+  // hand, Play again) and from the first click anywhere on the page, so the
+  // music reliably kicks in as soon as the person actually starts playing —
+  // even though the very first automatic call (right after the Kick login
+  // redirect, with no click yet) will likely get silently blocked.
+  function tryPlayMusic() {
+    if (!musicEl || musicStarted || musicEl.muted) return;
+    var p = musicEl.play();
+    if (p && typeof p.catch === 'function') {
+      p.then(function () { musicStarted = true; }).catch(function () {
+        // Blocked by autoplay policy — fine, it'll try again on the next click.
+      });
+    } else {
+      musicStarted = true;
+    }
   }
 
   function cardEl(card, clickable) {
@@ -74,10 +104,15 @@
     document.getElementById('player-scopa-count').textContent = fmt(playerScopas);
     document.getElementById('deck-count').textContent = fmt(deck.length);
     document.getElementById('turn-indicator').textContent = gameOver
-      ? 'round over'
+      ? 'hand over'
       : turn === 'player'
       ? 'your turn'
       : 'computer thinking…';
+
+    var scoreTag = document.getElementById('match-score-tag');
+    if (scoreTag) {
+      scoreTag.textContent = 'Match: You ' + matchScore.player + ' — ' + matchScore.ai + ' Computer (first to ' + Chkobba.MATCH_TARGET + ')';
+    }
   }
 
   function dealBatch() {
@@ -145,6 +180,10 @@
     render();
   }
 
+  // A HAND just ended (deck exhausted, both hands empty). Score it, fold it
+  // into the running match total, and either the match is decided (someone
+  // reached Chkobba.MATCH_TARGET and isn't tied) or it isn't — in which case
+  // another hand gets dealt automatically, same as real Chkobba.
   function endRound() {
     if (table.length && lastCapturer) {
       if (lastCapturer === 'player') playerCaptured = playerCaptured.concat(table);
@@ -154,8 +193,23 @@
     var result = Chkobba.scoreRound(playerCaptured, aiCaptured, playerScopas, aiScopas);
     gameOver = true;
     render();
-    showResult(result);
-    if (result.playerTotal > result.aiTotal) reportWin();
+
+    matchScore.player += result.playerTotal;
+    matchScore.ai += result.aiTotal;
+
+    var target = Chkobba.MATCH_TARGET;
+    var reachedTarget = matchScore.player >= target || matchScore.ai >= target;
+    var tied = matchScore.player === matchScore.ai;
+    var decided = reachedTarget && !tied;
+
+    if (decided) {
+      pendingNextHand = false;
+      showResult(result, true);
+      if (matchScore.player > matchScore.ai) reportWin();
+    } else {
+      pendingNextHand = true;
+      showResult(result, false);
+    }
   }
 
   function breakdownLine(label, playerPts, aiPts) {
@@ -165,11 +219,29 @@
     );
   }
 
-  function showResult(result) {
+  function showResult(result, isFinal) {
     var title = document.getElementById('result-title');
-    if (result.playerTotal > result.aiTotal) title.textContent = 'You win! 🎉';
-    else if (result.aiTotal > result.playerTotal) title.textContent = 'Computer wins';
-    else title.textContent = "It's a draw";
+    var subtitle = document.getElementById('result-subtitle');
+    var btn = document.getElementById('play-again-btn');
+
+    if (isFinal) {
+      if (matchScore.player > matchScore.ai) title.textContent = 'You win the match! 🎉';
+      else title.textContent = 'Computer wins the match';
+      if (subtitle) {
+        subtitle.textContent = 'Final score — You ' + matchScore.player + ' · Computer ' + matchScore.ai;
+      }
+      if (btn) btn.textContent = 'Play again';
+    } else {
+      if (result.playerTotal > result.aiTotal) title.textContent = 'You win this hand';
+      else if (result.aiTotal > result.playerTotal) title.textContent = 'Computer wins this hand';
+      else title.textContent = 'This hand is tied';
+      if (subtitle) {
+        subtitle.textContent =
+          'Match score — You ' + matchScore.player + ' · Computer ' + matchScore.ai +
+          ' (first to ' + Chkobba.MATCH_TARGET + ' wins the match)';
+      }
+      if (btn) btn.textContent = 'Next hand →';
+    }
 
     var b = result.breakdown;
     document.getElementById('result-breakdown').innerHTML =
@@ -178,10 +250,23 @@
       breakdownLine('Sette bello', b.player.setteBello, b.ai.setteBello) +
       breakdownLine('Primiera', b.player.primiera, b.ai.primiera) +
       breakdownLine('Scopas', b.player.scopas, b.ai.scopas) +
-      '<div class="result-row result-total"><span>Total</span><span>' +
+      '<div class="result-row result-total"><span>Hand total</span><span>' +
       result.playerTotal + ' — ' + result.aiTotal + '</span></div>';
 
     document.getElementById('result-overlay').hidden = false;
+
+    if (autoAdvanceTimer) {
+      clearTimeout(autoAdvanceTimer);
+      autoAdvanceTimer = null;
+    }
+    if (!isFinal) {
+      // Between-hand notice auto-advances on its own after a few seconds —
+      // clicking "Next hand" early just gets there sooner.
+      autoAdvanceTimer = setTimeout(function () {
+        autoAdvanceTimer = null;
+        if (pendingNextHand) startHand();
+      }, 3200);
+    }
   }
 
   function reportWin() {
@@ -190,7 +275,12 @@
       .catch(function () {});
   }
 
-  function startNewRound() {
+  // Deals a fresh HAND (does not touch matchScore).
+  function startHand() {
+    if (autoAdvanceTimer) {
+      clearTimeout(autoAdvanceTimer);
+      autoAdvanceTimer = null;
+    }
     deck = Chkobba.shuffle(Chkobba.buildDeck());
     table = deck.splice(0, 4);
     playerCaptured = [];
@@ -203,6 +293,25 @@
     dealBatch();
     document.getElementById('result-overlay').hidden = true;
     render();
+  }
+
+  // Starts a brand-new MATCH — resets the cumulative score back to 0-0.
+  function startNewMatch() {
+    matchScore = { player: 0, ai: 0 };
+    pendingNextHand = false;
+    startHand();
+    tryPlayMusic();
+  }
+
+  function onPlayAgainClick() {
+    tryPlayMusic();
+    if (pendingNextHand) startHand();
+    else startNewMatch();
+  }
+
+  function onNewMatchClick() {
+    tryPlayMusic();
+    startNewMatch();
   }
 
   function leaderboardRow(rank, username, wins, maxWins) {
@@ -252,6 +361,21 @@
   function init() {
     var params = new URLSearchParams(window.location.search);
 
+    musicEl = document.getElementById('game-music');
+    var musicToggle = document.getElementById('music-toggle');
+    if (musicToggle) {
+      musicToggle.addEventListener('click', function () {
+        if (!musicEl) return;
+        musicEl.muted = !musicEl.muted;
+        musicToggle.textContent = musicEl.muted ? '🔇' : '🔊';
+        musicToggle.setAttribute('aria-label', musicEl.muted ? 'Unmute music' : 'Mute music');
+        if (!musicEl.muted) tryPlayMusic();
+      });
+    }
+    // In case the very first automatic play attempt (right after the Kick
+    // login redirect) got blocked, the next tap anywhere on the page nudges it.
+    document.addEventListener('click', tryPlayMusic, { once: true });
+
     fetch('/api/player-session')
       .then(function (res) { return res.json(); })
       .then(function (data) {
@@ -269,10 +393,10 @@
         currentPlayer = data.player;
         document.getElementById('player-name').textContent = currentPlayer.username;
         document.getElementById('game-area').hidden = false;
-        startNewRound();
+        startNewMatch();
 
-        document.getElementById('new-round-btn').addEventListener('click', startNewRound);
-        document.getElementById('play-again-btn').addEventListener('click', startNewRound);
+        document.getElementById('new-round-btn').addEventListener('click', onNewMatchClick);
+        document.getElementById('play-again-btn').addEventListener('click', onPlayAgainClick);
       })
       .catch(function () {
         document.getElementById('login-gate').hidden = false;

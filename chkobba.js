@@ -1,14 +1,20 @@
-// Chkobba (the Tunisian card game, aka Scopa) — a complete single-hand
-// 2-player engine (you vs the computer), pure logic, no DOM. Standard
-// 52-card deck with 8/9/10 removed (40 cards): A,2..7,J,Q,K per suit,
-// J/Q/K counting as 8/9/10 for play + scoring. Diamonds is the "coins"
-// suit used for the coins-count and sette-bello scoring categories.
+// Chkobba (the Tunisian card game, aka Scopa) — a complete engine (you vs
+// the computer), pure logic, no DOM. 40 cards, 4 suits, ranks 1-10 — shown
+// and called entirely by number, the way it's actually played in Tunisia
+// (no J/Q/K letters). Diamonds is the "coins" suit used for the
+// coins-count and sette-bello ("bermila") scoring categories. Matches the
+// same system as chkobbeta.tn/game: deal 3 to each player + 4 to the
+// table, played anticlockwise, four scoring categories (karta/dineri/
+// bermila/7ayya = cards/coins/sette-bello/primiera) plus one point per
+// chkobba, first to 21 cumulative points across as many hands as it takes
+// wins the match.
 window.Chkobba = (function () {
   var SUITS = ['hearts', 'diamonds', 'clubs', 'spades'];
   var COINS_SUIT = 'diamonds';
   var SUIT_SYMBOLS = { hearts: '♥', diamonds: '♦', clubs: '♣', spades: '♠' };
   var RED_SUITS = { hearts: true, diamonds: true };
-  var RANK_LABELS = { 1: 'A', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: 'J', 9: 'Q', 10: 'K' };
+  // Tunisian Chkobba is played and called entirely by number — no J/Q/K.
+  var RANK_LABELS = { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: '10' };
   // Classic "primiera" ranking — 7 is worth the most, then 6, then 5... face cards worth the least.
   var PRIMIERA_VALUE = { 7: 21, 6: 18, 5: 15, 4: 14, 3: 13, 2: 12, 1: 11, 8: 10, 9: 10, 10: 10 };
 
@@ -188,6 +194,7 @@ window.Chkobba = (function () {
   }
 
   return {
+    MATCH_TARGET: 21,
     SUITS: SUITS,
     COINS_SUIT: COINS_SUIT,
     SUIT_SYMBOLS: SUIT_SYMBOLS,

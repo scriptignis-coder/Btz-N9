@@ -22,6 +22,20 @@ require('./db')
 // is needed).
 require('./chat-listener').init();
 
+// Render's free tier puts the service to sleep after ~15 minutes with no
+// visitors, which drops the chat listener above — it reconnects fine once
+// something wakes the site back up, but a gift/message that happens while
+// asleep is simply never seen. If SITE_URL is set (needed anyway for the
+// Chkobba login), ping our own homepage every 10 minutes to keep the free
+// tier awake, so the leaderboards can actually track continuously instead
+// of only whenever someone happens to be browsing the site.
+if (process.env.SITE_URL) {
+  const selfUrl = process.env.SITE_URL.replace(/\/+$/, '') + '/';
+  setInterval(() => {
+    fetch(selfUrl).catch(() => {});
+  }, 10 * 60_000);
+}
+
 // ---------- API routes (each file is: module.exports = async (req, res) => {...},
 // which is also valid Express middleware). ----------
 app.all('/api/login', require('./login'));
@@ -70,6 +84,7 @@ const STATIC_FILES = [
   'moment-2.jpg',
   'shop-banner.jpg',
   'grain.png',
+  'game-music.mp3',
 ];
 for (const name of STATIC_FILES) {
   app.get('/' + name, (req, res) => res.sendFile(file(name)));

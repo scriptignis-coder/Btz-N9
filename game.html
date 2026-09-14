@@ -17,8 +17,10 @@
     <div class="game-hero">
       <span class="shop-page-eyebrow">THE N9 &amp; BTZ — Game Play</span>
       <h1>Chkobba</h1>
-      <p class="game-hero-sub">Play a hand of Chkobba against the computer. Win to climb the leaderboard under your real Kick name.</p>
+      <p class="game-hero-sub">Play Chkobba against the computer — real Tunisian rules, first to 21 points across as many hands as it takes wins the match. Win to climb the leaderboard under your real Kick name.</p>
     </div>
+
+    <audio id="game-music" src="/game-music.mp3" loop preload="auto"></audio>
 
     <!-- Shown when nobody is logged in yet -->
     <div id="login-gate" class="game-gate" hidden>
@@ -30,7 +32,11 @@
     <div id="game-area" class="game-area" hidden>
       <div class="game-topbar">
         <span class="game-player-tag">Playing as <b id="player-name"></b></span>
-        <a href="/api/player-logout" class="game-logout">Log out</a>
+        <div class="game-topbar-right">
+          <span id="match-score-tag" class="game-player-tag">Match: 0 — 0</span>
+          <button type="button" id="music-toggle" class="game-music-toggle" aria-label="Mute music">🔊</button>
+          <a href="/api/player-logout" class="game-logout">Log out</a>
+        </div>
       </div>
 
       <div class="chkobba-board">
@@ -53,14 +59,16 @@
       </div>
 
       <div class="game-controls">
-        <button type="button" id="new-round-btn" class="btn-ghost">New round</button>
+        <button type="button" id="new-round-btn" class="btn-ghost">New match</button>
       </div>
     </div>
 
-    <!-- Result overlay -->
+    <!-- Result overlay — reused both for a "hand won, match continues" notice
+         (auto-advances) and for the final match result. -->
     <div id="result-overlay" class="result-overlay" hidden>
       <div class="result-card">
         <span id="result-title" class="result-title">You win!</span>
+        <p id="result-subtitle" class="result-subtitle"></p>
         <div id="result-breakdown" class="result-breakdown"></div>
         <button type="button" id="play-again-btn" class="btn-solid">Play again</button>
       </div>

@@ -84,7 +84,7 @@ numbers stay manually typed in `home.html`, in each streamer's
 re-upload (or edit directly in GitHub's web editor — pencil icon on the
 file).
 
-## 4. Stream Stats page + Top Chatters (fully automatic, no login needed)
+## 4. Stream Stats page + Top Chatters + Top Gifters (fully automatic, no login needed)
 
 Nav → **Stream Stats** → pick ZaNouNi or B_b10 → opens `/stats/zanouni` or
 `/stats/b_b10`, with:
@@ -103,19 +103,42 @@ Nav → **Stream Stats** → pick ZaNouNi or B_b10 → opens `/stats/zanouni` or
   an official/documented Kick API** — Kick could change it without notice.
   If that happens, the Top Chatters list just stops updating (shows "Not
   tracking chat yet") — nothing else on the site is affected.
-  One practical note: Render's free tier puts the site to sleep after 15
-  minutes with no visitors, which drops the chat connection — it
-  reconnects automatically as soon as the site wakes back up, but the
-  chatter counts reset when that happens (same as a real "new live
-  session" reset). On a paid Render plan (always-on) this wouldn't happen.
+- **Top Gifters** — the same public feed also carries gift-sub events, so
+  this tracks who gifted the most subs over the last 7 days, no login
+  needed either. This specific event type is less documented/battle-tested
+  than chat messages across the tools that exist for it, so `chat-listener.js`
+  also logs every gift-shaped event it sees (visible in Render → your
+  service → Logs) — useful if a real gift happens and doesn't show up on
+  the leaderboard, since the log line shows exactly what Kick actually
+  sent so the parsing can be corrected precisely instead of guessed at.
+
+**Important for both leaderboards**: Render's free tier puts the site to
+sleep after ~15 minutes with no visitors, which drops the chat connection
+entirely — nothing is tracked while asleep, so a gift or a burst of chat
+that happens while nobody's browsing the site is simply missed (it isn't
+a bug, there's just no listener running at that moment). It reconnects
+fine once the site wakes back up. Two ways to reduce this:
+- Set `SITE_URL` (see section 5 below) — once set, the site quietly pings
+  its own homepage every 10 minutes to keep the free tier from sleeping in
+  the first place, so the leaderboards can track continuously instead of
+  only while someone happens to be on the site.
+- Or upgrade to a paid, always-on Render plan, which removes the sleep
+  behavior entirely.
 
 ## 5. Game Play — Chkobba (needs one extra setup step)
 
 Nav → the new **Game Play** section on the home page (before "Behind the
 scenes") → **Play now** → `/game`. A visitor logs in with their own Kick
-account, plays a hand of Chkobba (the Tunisian card game) against the
-computer, and a win puts them on the "Top players" leaderboard under their
-real Kick username.
+account and plays Chkobba (the Tunisian card game, same system as
+chkobbeta.tn) against the computer: cards are shown and called purely by
+number (no J/Q/K), on a green felt table, with music playing while a match
+is on. A match isn't decided by one hand — hands keep dealing automatically
+until someone's running score reaches 21 points, same as it's actually
+played — and only winning the full match puts a player on the "Top players"
+leaderboard under their real Kick username.
+
+The background music is `game-music.mp3` in the project folder — swap it
+for any other MP3 any time by uploading a new file with that exact name.
 
 This needs a real "Login with Kick" flow — genuinely different from
 everything else on the site, since it's the first feature where a random
@@ -134,6 +157,10 @@ Kick's own official login system handles it; two things to set up once:
    | Key | Value |
    | --- | --- |
    | `SITE_URL` | `https://your-site.onrender.com` (your exact Render URL, no trailing slash) |
+
+   (This same variable also keeps the site from sleeping on Render's free
+   tier — see the note at the end of section 4 — so it's worth setting even
+   if the Chkobba login isn't the main reason.)
 
 Redeploy after that. Nothing else needed — the leaderboard's database table
 creates itself automatically the same way the gifters one does.
