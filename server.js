@@ -7,6 +7,11 @@ app.use(express.json({ limit: '6mb' })); // photos travel as base64 JSON, a bit 
 const DIR = __dirname;
 const file = (name) => path.join(DIR, name);
 
+// Start listening to the public Kick chat feed for both streamers so the
+// Top Chatters leaderboard is always tracking in the background — see
+// chat-listener.js for how (and why no login from them is needed).
+require('./chat-listener').init();
+
 // ---------- API routes (each file is: module.exports = async (req, res) => {...},
 // which is also valid Express middleware). ----------
 app.all('/api/login', require('./login'));
@@ -17,6 +22,7 @@ app.all('/api/toggle-stock', require('./toggle-stock'));
 app.all('/api/set-promo', require('./set-promo'));
 app.all('/api/delete-product', require('./delete-product'));
 app.get('/api/kick-status', require('./kick-status'));
+app.get('/api/top-chatters', require('./top-chatters'));
 
 // ---------- Pages (every project file is flat in this folder, so each public page
 // is served explicitly by name — this also keeps server-side files like server.js,

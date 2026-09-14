@@ -1764,7 +1764,11 @@ section {
 .stat-bars-card {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 0 24px 80px;
+  padding: 0 24px 28px;
+}
+
+.stat-bars-card:last-child {
+  padding-bottom: 80px;
 }
 
 .stat-bars-card > .stat-bars-head {
@@ -1891,4 +1895,103 @@ section {
     width: 140px;
     height: 140px;
   }
+}
+
+/* ---------- Top chatters leaderboard ---------- */
+
+.chatters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 26px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 0 0 6px 6px;
+}
+
+.chatters-empty {
+  margin: 0;
+  padding: 30px 26px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 0 0 6px 6px;
+  color: var(--text-faint);
+  font-size: 0.86rem;
+  text-align: center;
+}
+
+.chatter-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.chatter-rank {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+}
+
+.chatter-row:nth-child(1) .chatter-rank {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: var(--accent-ink);
+}
+
+.chatter-main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chatter-row-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.chatter-name {
+  font-family: 'Libre Franklin', sans-serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chatter-count {
+  flex: 0 0 auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.chatter-track {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.chatter-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  transition: width 0.5s ease;
 }

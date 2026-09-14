@@ -84,7 +84,32 @@ numbers stay manually typed in `home.html`, in each streamer's
 re-upload (or edit directly in GitHub's web editor — pencil icon on the
 file).
 
-## 4. Using the site
+## 4. Stream Stats page + Top Chatters (fully automatic, no login needed)
+
+Nav → **Stream Stats** → pick ZaNouNi or B_b10 → opens `/stats/zanouni` or
+`/stats/b_b10`, with:
+
+- **Followers, Live status** — same automatic data as the home page.
+- **Peak viewers / Hours live (30d) / Streak** — same manually-typed
+  numbers as the roster cards (edit them in `stats.js` near the top,
+  `STREAMERS.zanouni` / `STREAMERS.b_b10` — the same numbers as `home.html`'s
+  stat-rows, kept in sync by hand).
+- **Top Chatters** — a live top-10 list of who's chatting the most, reset
+  automatically every time that streamer goes live. This needs **zero
+  login or setup from ZaNouNi or B_b10** — no OAuth click, nothing. It
+  works by listening to the exact same public real-time chat feed
+  kick.com's own website uses to show chat to any visitor who isn't even
+  logged in (`chat-listener.js`). Like the follower count, this is **not
+  an official/documented Kick API** — Kick could change it without notice.
+  If that happens, the Top Chatters list just stops updating (shows "Not
+  tracking chat yet") — nothing else on the site is affected.
+  One practical note: Render's free tier puts the site to sleep after 15
+  minutes with no visitors, which drops the chat connection — it
+  reconnects automatically as soon as the site wakes back up, but the
+  chatter counts reset when that happens (same as a real "new live
+  session" reset). On a paid Render plan (always-on) this wouldn't happen.
+
+## 5. Using the site
 
 - `your-site.onrender.com/` — public site
 - `your-site.onrender.com/admin` — admin panel (login with the
@@ -94,12 +119,14 @@ file).
   ~~200 DT~~ **50 DT**), a photo (max 4 MB), in-stock checkbox.
 - Toggle stock, edit promo price, or delete any product any time.
 
-## 5. Editing the site later
+## 6. Editing the site later
 
 Every page is a plain `.html` file you can open and edit directly:
 
 - `home.html` — the home page (roster, schedule, shop grid, moments)
 - `shop.html` — the shop category page template
+- `stats.html` — the Stream Stats page template (`stats.js` holds the
+  per-streamer Peak viewers / Hours live / Streak numbers to hand-edit)
 - `admin.html` / `admin-login.html` — the admin panel and its login page
 - `styles.css` — every color and font, as CSS variables at the very top
 

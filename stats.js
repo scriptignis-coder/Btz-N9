@@ -55,6 +55,58 @@
     );
   }
 
+  function escapeHtml(str) {
+    return String(str).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function chatterRow(rank, username, count, maxCount) {
+    var pct = Math.max(6, Math.round((count / maxCount) * 100));
+    return (
+      '<div class="chatter-row">' +
+      '<span class="chatter-rank">' + rank + '</span>' +
+      '<div class="chatter-main">' +
+      '<div class="chatter-row-head"><span class="chatter-name">' + escapeHtml(username) + '</span>' +
+      '<span class="chatter-count">' + fmt(count) + '</span></div>' +
+      '<div class="chatter-track"><div class="chatter-fill" style="width:' + pct + '%"></div></div>' +
+      '</div>' +
+      '</div>'
+    );
+  }
+
+  function pollTopChatters(slug) {
+    fetch('/api/top-chatters?streamer=' + encodeURIComponent(slug))
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var list = document.getElementById('chatters-list');
+        var empty = document.getElementById('chatters-empty');
+        var sub = document.getElementById('chatters-sub');
+        var chatters = data.chatters || [];
+
+        sub.textContent = data.is_live
+          ? 'This live session — resets when a new stream starts'
+          : 'Offline — showing the last tracked live session';
+
+        if (!chatters.length) {
+          list.innerHTML = '';
+          list.hidden = true;
+          empty.textContent = data.tracking
+            ? 'No chat activity tracked yet for this session.'
+            : 'Not tracking chat yet — check back shortly.';
+          empty.hidden = false;
+          return;
+        }
+        list.hidden = false;
+        empty.hidden = true;
+        var maxCount = chatters[0].count || 1;
+        list.innerHTML = chatters
+          .map(function (c, i) { return chatterRow(i + 1, c.username, c.count, maxCount); })
+          .join('');
+      })
+      .catch(function () {});
+  }
+
   function init() {
     var slug = window.location.pathname.split('/').filter(Boolean).pop();
     var s = STREAMERS[slug];
@@ -112,6 +164,9 @@
         }
       })
       .catch(function () {});
+
+    pollTopChatters(slug);
+    setInterval(function () { pollTopChatters(slug); }, 20000);
   }
 
   init();
