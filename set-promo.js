@@ -1,5 +1,5 @@
-const { requireAdmin } = require('./_lib/auth');
-const { setProductPromo } = require('./_lib/db');
+const { requireAdmin } = require('./auth');
+const { setProductPromo } = require('./db');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {

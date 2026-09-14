@@ -1,4 +1,4 @@
-const { isAdminRequest } = require('./_lib/auth');
+const { isAdminRequest } = require('./auth');
 
 module.exports = async (req, res) => {
   res.status(200).json({ authenticated: isAdminRequest(req) });

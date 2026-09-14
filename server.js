@@ -4,25 +4,33 @@ const express = require('express');
 const app = express();
 app.use(express.json({ limit: '6mb' })); // photos travel as base64 JSON, a bit above the 4MB cap we enforce
 
-const PUBLIC_DIR = path.join(__dirname, 'public');
+const DIR = __dirname;
+const file = (name) => path.join(DIR, name);
 
-// ---------- API routes (each file is the same handler shape used by the Vercel version:
-// module.exports = async (req, res) => {...}, which is also valid Express middleware). ----------
-app.all('/api/login', require('./api/login'));
-app.all('/api/logout', require('./api/logout'));
-app.all('/api/session', require('./api/session'));
-app.all('/api/products', require('./api/products'));
-app.all('/api/toggle-stock', require('./api/toggle-stock'));
-app.all('/api/set-promo', require('./api/set-promo'));
-app.all('/api/delete-product', require('./api/delete-product'));
+// ---------- API routes (each file is: module.exports = async (req, res) => {...},
+// which is also valid Express middleware). ----------
+app.all('/api/login', require('./login'));
+app.all('/api/logout', require('./logout'));
+app.all('/api/session', require('./session'));
+app.all('/api/products', require('./products'));
+app.all('/api/toggle-stock', require('./toggle-stock'));
+app.all('/api/set-promo', require('./set-promo'));
+app.all('/api/delete-product', require('./delete-product'));
 
-// ---------- Clean-URL page routes ----------
-app.get('/admin', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin/index.html')));
-app.get('/admin/login', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'admin/login/index.html')));
-app.get('/shop/:category', (req, res) => res.sendFile(path.join(PUBLIC_DIR, 'shop.html')));
+// ---------- Pages (every project file is flat in this folder, so each public page
+// is served explicitly by name — this also keeps server-side files like server.js,
+// package.json, and the api handlers from ever being served as downloadable static files). ----------
+app.get('/', (req, res) => res.sendFile(file('home.html')));
+app.get('/shop/:category', (req, res) => res.sendFile(file('shop.html')));
+app.get('/admin', (req, res) => res.sendFile(file('admin.html')));
+app.get('/admin/login', (req, res) => res.sendFile(file('admin-login.html')));
 
-// ---------- Everything else: plain static files (index.html, styles.css, js/, ...) ----------
-app.use(express.static(PUBLIC_DIR));
+// ---------- Static assets the pages load (css/js only — nothing else in this folder
+// is reachable over the web). ----------
+const STATIC_FILES = ['styles.css', 'shop.js', 'admin.js', 'admin-login.js'];
+for (const name of STATIC_FILES) {
+  app.get('/' + name, (req, res) => res.sendFile(file(name)));
+}
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log('THE N9 & BTZ listening on port ' + PORT));

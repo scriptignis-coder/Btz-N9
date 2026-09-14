@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — THE N9 &amp; BTZ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Libre+Franklin:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <main class="admin-shell" id="admin-shell" style="display:none;">
+    <header class="admin-header">
+      <div>
+        <span class="eyebrow">THE N9 &amp; BTZ</span>
+        <h1>Admin panel</h1>
+      </div>
+      <button type="button" class="btn-ghost" id="logout-btn">Sign out</button>
+    </header>
+
+    <p id="db-error" class="auth-error" style="display:none;"></p>
+
+    <section class="admin-card">
+      <h2>Add a product</h2>
+      <form id="add-form">
+        <div class="admin-form-grid">
+          <label class="field">
+            <span>Category</span>
+            <select id="f-category" name="category" required>
+              <option value="" disabled selected>Choose one</option>
+              <option value="hoodies">Hoodies &amp; Tops</option>
+              <option value="joggers">Joggers &amp; Sweatpants</option>
+              <option value="shorts">Shorts</option>
+              <option value="caps">Caps</option>
+              <option value="accessories">Accessories</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Section</span>
+            <select id="f-gender" name="gender" required>
+              <option value="" disabled selected>Choose one</option>
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Name</span>
+            <input id="f-name" name="name" type="text" required placeholder="Signature hoodie">
+          </label>
+          <label class="field">
+            <span>Price (DT)</span>
+            <input id="f-price" name="price" type="number" min="0" step="1" required>
+          </label>
+          <label class="field">
+            <span>Promo price (DT, optional)</span>
+            <input id="f-promo" name="promoPrice" type="number" min="0" step="1">
+          </label>
+          <label class="field">
+            <span>Photo (max 4 MB)</span>
+            <input id="f-photo" name="photo" type="file" accept="image/*">
+          </label>
+        </div>
+        <label class="field-check">
+          <input id="f-instock" name="inStock" type="checkbox" checked>
+          <span>In stock</span>
+        </label>
+        <button type="submit" class="btn-solid" id="add-submit">Add product</button>
+        <p id="add-status" class="form-status" style="display:none;"></p>
+      </form>
+    </section>
+
+    <div id="category-sections"></div>
+  </main>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

@@ -1,149 +1,69 @@
-# THE N9 & BTZ — site (Render + GitLab, no Vercel/Netlify)
+# THE N9 & BTZ — site (flat structure, for Render + GitHub/GitLab)
 
-A real Node.js website for ZaNouNi & B_b10 — plain `.html`/`.css` pages, a
-small Express server, a password-protected admin panel, a real database,
-and real photo uploads. Built to deploy on **Render**, with code hosted on
-**GitLab**, a free **Neon** Postgres database, and free **Cloudinary**
-photo storage — no Vercel, no Netlify.
+Same site as before (real `.html`/`.css` pages, Express server, password
+admin panel, Neon database, Cloudinary photos) but restructured so **every
+file sits directly in one folder — no subfolders at all.** This exists
+because GitHub/GitLab's plain browser upload doesn't reliably preserve
+nested folders, which is what broke the earlier version's deploy. Uploading
+this version is just: select every file in this folder and drop them in —
+there is nothing else to get wrong.
 
-## 1. Accounts you'll need (all free)
+## 1. Upload these files to your repo
 
-| Service | What it's for | Sign up at |
-| --- | --- | --- |
-| GitLab | holds the code | gitlab.com |
-| Render | runs the site | render.com |
-| Neon | the database (products) | neon.tech |
-| Cloudinary | stores product photos | cloudinary.com |
+1. Open your repo on GitHub (`scriptignis-coder/Btz-N9`).
+2. Delete the old files that are in there now (select them → Delete), or
+   just upload over them — either way.
+3. **Add file → Upload files**.
+4. Open the `n9btz-flat` folder you unzipped, select **every file inside it**
+   (Ctrl+A), and drag them all into the upload box. Since nothing is in a
+   subfolder, there's no structure that can get lost.
+5. Commit.
+6. In Render, open your service → **Manual Deploy → Deploy latest commit**
+   (or **Clear build cache & deploy** if it still fails).
 
-Sign up for all four with a real email (verify it) — that avoids the kind
-of account-flag issue you hit with GitHub.
+## 2. Environment variables (Render → your service → Environment)
 
-## 2. Put the code on GitLab
+You already have these values from Neon and Cloudinary:
 
-You already did this part if you followed along — if not:
+| Key | Value |
+| --- | --- |
+| `DATABASE_URL` | your Neon connection string |
+| `CLOUDINARY_CLOUD_NAME` | from Cloudinary dashboard |
+| `CLOUDINARY_API_KEY` | from Cloudinary dashboard |
+| `CLOUDINARY_API_SECRET` | from Cloudinary dashboard |
+| `ADMIN_USERNAME` | pick one |
+| `ADMIN_PASSWORD` | pick one |
+| `SESSION_SECRET` | any long random string |
 
-1. Create a new project on gitlab.com (**Create new project → Create blank
-   project**), name it e.g. `n9btz-site`.
-2. On the project page, **Upload File** (or the **+** menu) and drag in
-   everything from this folder (`server.js`, `package.json`, `public/`,
-   `api/`, `scripts/`, `README.md`, `.gitignore`, `.env.example`) — not
-   `node_modules` if it exists locally.
-3. Commit.
+Build Command: `npm install` — Start Command: `npm start`.
 
-## 3. Create the database (Neon)
+## 3. Using the site
 
-1. Sign up at **neon.tech**, create a new project.
-2. On the project dashboard, copy the **connection string** (starts with
-   `postgresql://...`) — this is your `DATABASE_URL`.
-3. Open Neon's **SQL Editor** and paste in the contents of
-   [`scripts/schema.sql`](./scripts/schema.sql), then run it once. This
-   creates the `products` table.
+- `your-site.onrender.com/` — public site
+- `your-site.onrender.com/admin` — admin panel (login with the
+  `ADMIN_USERNAME` / `ADMIN_PASSWORD` you set)
+- Add a product: category, Men/Women, name, price, optional promo price
+  (shows as a strikethrough original price + the promo price, e.g.
+  ~~200 DT~~ **50 DT**), a photo (max 4 MB), in-stock checkbox.
+- Toggle stock, edit promo price, or delete any product any time.
 
-## 4. Create photo storage (Cloudinary)
+## 4. Editing the site later
 
-1. Sign up at **cloudinary.com** (free plan).
-2. On your Dashboard's home page, you'll see **Cloud name**, **API Key**,
-   and **API Secret** — copy all three.
+Every page is a plain `.html` file you can open and edit directly:
 
-## 5. Deploy the site (Render)
+- `home.html` — the home page (roster, schedule, shop grid)
+- `shop.html` — the shop category page template
+- `admin.html` / `admin-login.html` — the admin panel and its login page
+- `styles.css` — every color and font, as CSS variables at the very top
 
-1. Sign up / log in at **render.com** — choose **"GitLab"** to connect
-   your account (this is the same OAuth-style connection GitHub gave you
-   trouble with, but on GitLab, which isn't flagged).
-2. **New → Web Service**, pick the `n9btz-site` repository you pushed to
-   GitLab.
-3. Fill in:
-   - **Name**: anything, e.g. `n9btz-site`
-   - **Runtime**: Node
-   - **Build Command**: `npm install`
-   - **Start Command**: `npm start`
-   - **Instance Type**: Free
-4. Before clicking **Create Web Service**, open **Advanced → Add
-   Environment Variable** and add all six:
+To add real roster/schedule photos: drop images anywhere convenient (e.g.
+ask for a `photos/` folder to be added — since this build has no
+subfolders, that would need `server.js` updated to serve it too), and
+replace the `<span class="placeholder-tag">…</span>` blocks in `home.html`
+with `<img>` tags.
 
-   | Key | Value |
-   | --- | --- |
-   | `DATABASE_URL` | the Neon connection string from step 3 |
-   | `CLOUDINARY_CLOUD_NAME` | from step 4 |
-   | `CLOUDINARY_API_KEY` | from step 4 |
-   | `CLOUDINARY_API_SECRET` | from step 4 |
-   | `ADMIN_USERNAME` | any username you want to log in with |
-   | `ADMIN_PASSWORD` | a strong password |
-   | `SESSION_SECRET` | any long random string (32+ characters) |
-
-5. Click **Create Web Service**. Render installs, builds, and starts the
-   site — takes a minute or two the first time.
-
-Your site is live at the `*.onrender.com` URL Render gives you. Add a
-custom domain later under the service's **Settings → Custom Domains**.
-
-**Free-tier note**: Render's free web services "sleep" after 15 minutes
-with no visitors, so the very first visit after a quiet period takes
-~30-50 seconds to wake up — after that it's fast again until it goes quiet
-once more. The database (Neon) and photos (Cloudinary) are unaffected by
-this and don't sleep or expire.
-
-## 6. Using the admin panel
-
-Visit `your-site.onrender.com/admin` (also linked from the site's nav bar
-and footer). Sign in with the username/password from step 5:
-
-- **Add a product**: category, Men/Women section, name, price, optional
-  promo price, a photo (max 4 MB), and whether it's in stock.
-- **Toggle stock**: click the "In stock" / "Out of stock" pill to flip it.
-- **Promo price**: type a number and click **Set**; clear it and click
-  **Set** to remove a promo (shows as a strikethrough original price with
-  the promo price next to it, e.g. ~~200 DT~~ **50 DT**).
-- **Delete**: removes the product and its photo for good.
-
-## 7. Adding real photos to the site itself
-
-The roster and schedule sections show placeholder tiles with the
-streamers' names instead of photos (none were included in this handoff).
-To add real ones:
-
-1. Drop images into `public/photos/` (create the folder), e.g.
-   `roster-left.jpg`.
-2. In `public/index.html`, replace the `<span class="placeholder-tag">…</span>`
-   inside `.roster-row-photo` / `.schedule-photo` with an `<img
-   src="/photos/roster-left.jpg" alt="ZaNouNi">`.
-3. Push the change to GitLab — Render redeploys automatically.
-
-Product photos don't need this step — they're uploaded from the admin
-panel straight to Cloudinary.
-
-## 8. Local development
-
-```bash
-npm install
-cp .env.example .env   # fill in the values from steps 3-5
-npm start
-```
-
-Then open `http://localhost:3000`.
-
-## 9. Project structure
-
-```
-server.js                 Express app: static files + API routes
-public/
-  index.html               Home page
-  styles.css                 Design tokens (colors, fonts, layout)
-  shop.html                   Shop category template (served at /shop/:category)
-  admin/index.html              Admin panel
-  admin/login/index.html          Sign-in form
-  js/                                Client-side logic for the pages above
-api/
-  login.js / logout.js / session.js     Auth
-  products.js                            List (public) / add (admin) products
-  toggle-stock.js / set-promo.js / delete-product.js
-  _lib/auth.js                            Session cookie signing/verification
-  _lib/db.js                              Neon Postgres queries
-  _lib/storage.js                         Cloudinary photo upload/delete
-scripts/schema.sql          Run once in Neon to create the products table
-```
-
-Every page in `public/` is a real `.html` file — open any of them
-directly and edit; no build step, no compiling. `styles.css` keeps every
-color and font as a variable at the top (`:root { --bg: …; --accent: …; }`)
-if you want to retheme anything.
+`server.js` explicitly lists every page and asset it serves (`home.html`,
+`shop.html`, `admin.html`, `admin-login.html`, `styles.css`, `shop.js`,
+`admin.js`, `admin-login.js`) — this is also why `server.js`,
+`package.json`, and the `.js` files behind `/api/...` are never directly
+downloadable by a visitor, only the pages themselves.

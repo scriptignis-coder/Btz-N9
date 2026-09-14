@@ -1,4 +1,4 @@
-const { checkCredentials, setSessionCookie } = require('./_lib/auth');
+const { checkCredentials, setSessionCookie } = require('./auth');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {

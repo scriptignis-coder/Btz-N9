@@ -1,6 +1,6 @@
-const { uploadPhoto } = require('./_lib/storage');
-const { requireAdmin } = require('./_lib/auth');
-const { CATEGORY_IDS, getAllProducts, getProductsByCategory, insertProduct } = require('./_lib/db');
+const { uploadPhoto } = require('./storage');
+const { requireAdmin } = require('./auth');
+const { CATEGORY_IDS, getAllProducts, getProductsByCategory, insertProduct } = require('./db');
 
 module.exports = async (req, res) => {
   if (req.method === 'GET') {

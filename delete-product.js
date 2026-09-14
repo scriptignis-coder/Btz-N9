@@ -1,6 +1,6 @@
-const { deletePhoto } = require('./_lib/storage');
-const { requireAdmin } = require('./_lib/auth');
-const { deleteProduct, getProduct } = require('./_lib/db');
+const { deletePhoto } = require('./storage');
+const { requireAdmin } = require('./auth');
+const { deleteProduct, getProduct } = require('./db');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
