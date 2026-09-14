@@ -21,6 +21,11 @@
   var pendingNextHand = false; // true while the overlay on screen is a "hand won" notice, not the final match result
   var autoAdvanceTimer = null;
 
+  // Real Chkobba has a "dealer can't score a chkobba with the very last
+  // card of the hand" rule. There's no rotating deal in a vs-computer game,
+  // so the computer is simply the permanent dealer for this purpose.
+  var AI_IS_DEALER = true;
+
   var musicEl = null;
   var musicStarted = false;
 
@@ -145,8 +150,15 @@
       else aiCaptured = aiCaptured.concat(captured);
       lastCapturer = who;
       if (wasFullTable && table.length === 0) {
-        if (who === 'player') playerScopas++;
-        else aiScopas++;
+        // The dealer doesn't get a chkobba for the very last card of the
+        // hand — real rule, stops a guaranteed free point from just
+        // however the deal happened to land.
+        var isLastCardOfHand = !deck.length && !playerHand.length && !aiHand.length;
+        var dealerBlocked = isLastCardOfHand && who === 'ai' && AI_IS_DEALER;
+        if (!dealerBlocked) {
+          if (who === 'player') playerScopas++;
+          else aiScopas++;
+        }
       }
     } else {
       table.push(card);
@@ -245,11 +257,11 @@
 
     var b = result.breakdown;
     document.getElementById('result-breakdown').innerHTML =
-      breakdownLine('Most cards', b.player.cards, b.ai.cards) +
-      breakdownLine('Most coins', b.player.coins, b.ai.coins) +
-      breakdownLine('Sette bello', b.player.setteBello, b.ai.setteBello) +
-      breakdownLine('Primiera', b.player.primiera, b.ai.primiera) +
-      breakdownLine('Scopas', b.player.scopas, b.ai.scopas) +
+      breakdownLine('Karta — most cards', b.player.cards, b.ai.cards) +
+      breakdownLine('Dineri — most diamonds', b.player.coins, b.ai.coins) +
+      breakdownLine('Bermila — most 7s', b.player.bermila, b.ai.bermila) +
+      breakdownLine('7ayya — 7 of diamonds', b.player.hayya, b.ai.hayya) +
+      breakdownLine('Chkobba', b.player.scopas, b.ai.scopas) +
       '<div class="result-row result-total"><span>Hand total</span><span>' +
       result.playerTotal + ' — ' + result.aiTotal + '</span></div>';
 
@@ -275,14 +287,29 @@
       .catch(function () {});
   }
 
+  // Shuffles and cuts a fresh deck + opening table, redealing if the 4
+  // table cards land void (3 or 4 of them share the same rank — the real
+  // rule, so a first-move sweep can't just happen by chance).
+  function dealOpeningTable() {
+    var freshDeck, freshTable;
+    var attempts = 0;
+    do {
+      freshDeck = Chkobba.shuffle(Chkobba.buildDeck());
+      freshTable = freshDeck.splice(0, 4);
+      attempts++;
+    } while (Chkobba.isVoidTableDeal(freshTable) && attempts < 25);
+    return { deck: freshDeck, table: freshTable };
+  }
+
   // Deals a fresh HAND (does not touch matchScore).
   function startHand() {
     if (autoAdvanceTimer) {
       clearTimeout(autoAdvanceTimer);
       autoAdvanceTimer = null;
     }
-    deck = Chkobba.shuffle(Chkobba.buildDeck());
-    table = deck.splice(0, 4);
+    var dealt = dealOpeningTable();
+    deck = dealt.deck;
+    table = dealt.table;
     playerCaptured = [];
     aiCaptured = [];
     playerScopas = 0;
