@@ -16,6 +16,7 @@ app.all('/api/products', require('./products'));
 app.all('/api/toggle-stock', require('./toggle-stock'));
 app.all('/api/set-promo', require('./set-promo'));
 app.all('/api/delete-product', require('./delete-product'));
+app.get('/api/kick-status', require('./kick-status'));
 
 // ---------- Pages (every project file is flat in this folder, so each public page
 // is served explicitly by name — this also keeps server-side files like server.js,
@@ -33,6 +34,7 @@ const STATIC_FILES = [
   'admin.js',
   'admin-login.js',
   'effects.js',
+  'live-status.js',
   'hero-duo.jpg',
   'roster-left.jpg',
   'roster-right.jpg',

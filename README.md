@@ -37,7 +37,50 @@ You already have these values from Neon and Cloudinary:
 
 Build Command: `npm install` — Start Command: `npm start`.
 
-## 3. Using the site
+## 3. Real follower counts, hours, streak (manual)
+
+Kick's own API doesn't expose follower count, peak viewers, hours-live or
+streak for any channel at all — checked directly against their spec, it
+just isn't there. So those numbers are meant to be typed in by hand and
+kept up to date whenever you want, in `home.html`:
+
+- Each streamer's `<div class="stat-row">` has 4 numbers: Followers, Peak
+  viewers, Hours live (30d), Streak — just edit the number inside the
+  matching `<div class="stat-value">…</div>`.
+- The `<div class="combined-bar">` near the bottom of the Roster section
+  has the 3 shared numbers (combined followers, joint streams, longest
+  co-stream) the same way.
+
+Edit, save, re-upload that one file to GitHub (or just edit it directly
+in GitHub's web editor — pencil icon on the file) and Render redeploys
+automatically.
+
+## 4. Real "LIVE — n watching" badge (optional, automatic)
+
+The one thing Kick's API *does* give for free is live/offline status and
+the real live viewer count while a stream is live — the site shows this
+as a small badge next to each streamer's name, automatically, once you
+connect it:
+
+1. On Kick: **Account Settings → Security** and turn on **2FA** (required
+   before the Developer tab unlocks).
+2. **Account Settings → Developer → Create an app**. It gives you a
+   **Client ID** and **Client Secret** — copy both (the redirect URL
+   field can be anything, e.g. `https://example.com`, since this site
+   only uses the app for public data, not sign-in).
+3. In Render → your service → Environment, add two more variables:
+
+   | Key | Value |
+   | --- | --- |
+   | `KICK_CLIENT_ID` | from step 2 |
+   | `KICK_CLIENT_SECRET` | from step 2 |
+
+4. Redeploy. The badge next to ZaNouNi's and B_b10's names will start
+   showing "Live — n watching" or "Offline" for real, refreshing every
+   45 seconds — until then it just stays hidden, the rest of the site is
+   unaffected.
+
+## 5. Using the site
 
 - `your-site.onrender.com/` — public site
 - `your-site.onrender.com/admin` — admin panel (login with the
@@ -47,23 +90,24 @@ Build Command: `npm install` — Start Command: `npm start`.
   ~~200 DT~~ **50 DT**), a photo (max 4 MB), in-stock checkbox.
 - Toggle stock, edit promo price, or delete any product any time.
 
-## 4. Editing the site later
+## 6. Editing the site later
 
 Every page is a plain `.html` file you can open and edit directly:
 
-- `home.html` — the home page (roster, schedule, shop grid)
+- `home.html` — the home page (roster, schedule, shop grid, moments)
 - `shop.html` — the shop category page template
 - `admin.html` / `admin-login.html` — the admin panel and its login page
 - `styles.css` — every color and font, as CSS variables at the very top
 
-To add real roster/schedule photos: drop images anywhere convenient (e.g.
-ask for a `photos/` folder to be added — since this build has no
-subfolders, that would need `server.js` updated to serve it too), and
-replace the `<span class="placeholder-tag">…</span>` blocks in `home.html`
-with `<img>` tags.
+Roster/hero/schedule/moments photos are already in the site
+(`hero-duo.jpg`, `roster-left.jpg`, `roster-right.jpg`, `moment-1.jpg`,
+`moment-2.jpg`) — to swap any of them for a new photo, just upload a new
+file with the exact same name (overwrite it on GitHub) and it updates
+everywhere it's used.
 
-`server.js` explicitly lists every page and asset it serves (`home.html`,
-`shop.html`, `admin.html`, `admin-login.html`, `styles.css`, `shop.js`,
-`admin.js`, `admin-login.js`) — this is also why `server.js`,
-`package.json`, and the `.js` files behind `/api/...` are never directly
-downloadable by a visitor, only the pages themselves.
+`server.js` explicitly lists every page and asset it serves — this is
+also why `server.js`, `package.json`, and the `.js` files behind
+`/api/...` are never directly downloadable by a visitor, only the pages
+themselves. If you ever add a brand-new file (not replacing an existing
+one), it also needs adding to the `STATIC_FILES` list near the top of
+`server.js` or Express won't serve it.
