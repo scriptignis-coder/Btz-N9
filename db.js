@@ -70,6 +70,47 @@ async function getProduct(id) {
   return rows[0];
 }
 
+// ---------- Gift-sub leaderboard ("Top gifters") ----------
+// Kick doesn't expose gift-sub history through any API, official or
+// unofficial — this only works because chat-listener.js sees each gift
+// event live (over the same public chat feed used for Top Chatters) and
+// records it here as it happens. Nothing is backfilled; the leaderboard
+// only knows about gifts sent while the site was awake and listening.
+
+async function ensureGiftEventsTable() {
+  const sql = client();
+  await sql`
+    CREATE TABLE IF NOT EXISTS gift_events (
+      id              SERIAL PRIMARY KEY,
+      streamer        TEXT NOT NULL,
+      gifter_username TEXT NOT NULL,
+      quantity        INTEGER NOT NULL CHECK (quantity > 0),
+      created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS gift_events_streamer_idx ON gift_events (streamer, created_at)`;
+}
+
+async function recordGift({ streamer, gifterUsername, quantity }) {
+  const sql = client();
+  await sql`
+    INSERT INTO gift_events (streamer, gifter_username, quantity)
+    VALUES (${streamer}, ${gifterUsername}, ${quantity})
+  `;
+}
+
+async function topGifters(streamer, days, limit) {
+  const sql = client();
+  return sql`
+    SELECT gifter_username, SUM(quantity)::int AS total
+    FROM gift_events
+    WHERE streamer = ${streamer} AND created_at > now() - (${days} * INTERVAL '1 day')
+    GROUP BY gifter_username
+    ORDER BY total DESC
+    LIMIT ${limit}
+  `;
+}
+
 module.exports = {
   CATEGORIES,
   CATEGORY_IDS,
@@ -80,4 +121,7 @@ module.exports = {
   setProductPromo,
   deleteProduct,
   getProduct,
+  ensureGiftEventsTable,
+  recordGift,
+  topGifters,
 };

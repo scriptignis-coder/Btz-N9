@@ -16,6 +16,7 @@
 // retries), the rest of the site is completely unaffected.
 
 const WebSocket = require('ws');
+const db = require('./db');
 
 const SLUGS = ['zanouni', 'b_b10'];
 const PUSHER_KEY = '32cbd69e4b950bf97679';
@@ -51,6 +52,28 @@ function bump(slug, username) {
   s.counts.set(username, (s.counts.get(username) || 0) + 1);
 }
 
+// Kick's gift-sub event isn't as battle-tested/documented as chat messages
+// across the reverse-engineered clients that exist for it — field naming
+// varies (snake_case on the wire, some libs re-case it) — so this reads
+// defensively across the variants seen in the wild instead of trusting one.
+function handleGift(slug, payload) {
+  if (!payload) return;
+  const gifter =
+    payload.gifter_username || payload.gifterUsername || (payload.gifter && payload.gifter.username) || null;
+  if (!gifter) return;
+
+  let quantity = null;
+  if (Array.isArray(payload.gifted_usernames)) quantity = payload.gifted_usernames.length;
+  else if (Array.isArray(payload.giftedUsernames)) quantity = payload.giftedUsernames.length;
+  else if (Number.isFinite(payload.quantity)) quantity = payload.quantity;
+  else if (Number.isFinite(payload.giftedCount)) quantity = payload.giftedCount;
+  if (!quantity || quantity <= 0) quantity = 1; // at least log that a gift happened
+
+  db.recordGift({ streamer: slug, gifterUsername: gifter, quantity }).catch(() => {
+    // DB not reachable this round — this one gift just isn't counted, nothing else breaks
+  });
+}
+
 function connectChat(slug) {
   const s = state[slug];
   if (!s.chatroomId) return;
@@ -82,6 +105,13 @@ function connectChat(slug) {
       try { payload = JSON.parse(msg.data); } catch (_) { return; }
       const username = payload && payload.sender && payload.sender.username;
       bump(slug, username);
+      return;
+    }
+
+    if (msg.event === 'App\\Events\\GiftedSubscriptionsEvent') {
+      let payload;
+      try { payload = JSON.parse(msg.data); } catch (_) { return; }
+      handleGift(slug, payload);
     }
   });
 

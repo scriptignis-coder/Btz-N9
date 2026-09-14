@@ -61,14 +61,15 @@
     });
   }
 
-  function chatterRow(rank, username, count, maxCount) {
+  function chatterRow(rank, username, count, maxCount, suffix) {
     var pct = Math.max(6, Math.round((count / maxCount) * 100));
+    var valueText = fmt(count) + (suffix ? ' ' + suffix : '');
     return (
       '<div class="chatter-row">' +
       '<span class="chatter-rank">' + rank + '</span>' +
       '<div class="chatter-main">' +
       '<div class="chatter-row-head"><span class="chatter-name">' + escapeHtml(username) + '</span>' +
-      '<span class="chatter-count">' + fmt(count) + '</span></div>' +
+      '<span class="chatter-count">' + valueText + '</span></div>' +
       '<div class="chatter-track"><div class="chatter-fill" style="width:' + pct + '%"></div></div>' +
       '</div>' +
       '</div>'
@@ -102,6 +103,39 @@
         var maxCount = chatters[0].count || 1;
         list.innerHTML = chatters
           .map(function (c, i) { return chatterRow(i + 1, c.username, c.count, maxCount); })
+          .join('');
+      })
+      .catch(function () {});
+  }
+
+  function pollTopGifters(slug) {
+    fetch('/api/top-gifters?streamer=' + encodeURIComponent(slug))
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var list = document.getElementById('gifters-list');
+        var empty = document.getElementById('gifters-empty');
+        var gifters = data.gifters || [];
+
+        if (!data.available) {
+          list.innerHTML = '';
+          list.hidden = true;
+          empty.textContent = 'Not available yet — check back shortly.';
+          empty.hidden = false;
+          return;
+        }
+
+        if (!gifters.length) {
+          list.innerHTML = '';
+          list.hidden = true;
+          empty.textContent = 'No gifted subs tracked yet in the last 7 days.';
+          empty.hidden = false;
+          return;
+        }
+        list.hidden = false;
+        empty.hidden = true;
+        var maxCount = gifters[0].count || 1;
+        list.innerHTML = gifters
+          .map(function (g, i) { return chatterRow(i + 1, g.username, g.count, maxCount, 'gifted'); })
           .join('');
       })
       .catch(function () {});
@@ -167,6 +201,9 @@
 
     pollTopChatters(slug);
     setInterval(function () { pollTopChatters(slug); }, 20000);
+
+    pollTopGifters(slug);
+    setInterval(function () { pollTopGifters(slug); }, 60000);
   }
 
   init();

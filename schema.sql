@@ -15,3 +15,16 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 CREATE INDEX IF NOT EXISTS products_category_idx ON products (category);
+
+-- Top Gifters leaderboard (Stream Stats page) — the app also creates this
+-- table itself on startup if it's missing, so running this by hand isn't
+-- required; it's here for reference / in case you want to inspect the data.
+CREATE TABLE IF NOT EXISTS gift_events (
+  id              SERIAL PRIMARY KEY,
+  streamer        TEXT NOT NULL,
+  gifter_username TEXT NOT NULL,
+  quantity        INTEGER NOT NULL CHECK (quantity > 0),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS gift_events_streamer_idx ON gift_events (streamer, created_at);
