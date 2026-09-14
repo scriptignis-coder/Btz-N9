@@ -27,7 +27,20 @@ app.get('/admin/login', (req, res) => res.sendFile(file('admin-login.html')));
 
 // ---------- Static assets the pages load (css/js only — nothing else in this folder
 // is reachable over the web). ----------
-const STATIC_FILES = ['styles.css', 'shop.js', 'admin.js', 'admin-login.js'];
+const STATIC_FILES = [
+  'styles.css',
+  'shop.js',
+  'admin.js',
+  'admin-login.js',
+  'effects.js',
+  'hero-duo.jpg',
+  'roster-left.jpg',
+  'roster-right.jpg',
+  'moment-1.jpg',
+  'moment-2.jpg',
+  'shop-banner.jpg',
+  'grain.png',
+];
 for (const name of STATIC_FILES) {
   app.get('/' + name, (req, res) => res.sendFile(file(name)));
 }
