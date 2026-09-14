@@ -23,6 +23,7 @@ app.get('/api/kick-status', require('./kick-status'));
 // package.json, and the api handlers from ever being served as downloadable static files). ----------
 app.get('/', (req, res) => res.sendFile(file('home.html')));
 app.get('/shop/:category', (req, res) => res.sendFile(file('shop.html')));
+app.get('/stats/:streamer', (req, res) => res.sendFile(file('stats.html')));
 app.get('/admin', (req, res) => res.sendFile(file('admin.html')));
 app.get('/admin/login', (req, res) => res.sendFile(file('admin-login.html')));
 
@@ -31,6 +32,7 @@ app.get('/admin/login', (req, res) => res.sendFile(file('admin-login.html')));
 const STATIC_FILES = [
   'styles.css',
   'shop.js',
+  'stats.js',
   'admin.js',
   'admin-login.js',
   'effects.js',

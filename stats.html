@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stream Stats — THE N9 &amp; BTZ</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Libre+Franklin:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <main class="shop-page-static">
+    <div class="shop-page-nav">
+      <a href="/#top" class="shop-page-back">← Back home</a>
+    </div>
+
+    <div class="stats-hero">
+      <div class="stats-hero-photo">
+        <img id="stats-photo" src="" alt="" class="photo-treat">
+        <div class="tint" aria-hidden="true"></div>
+        <div class="grain" aria-hidden="true"></div>
+      </div>
+      <div class="stats-hero-info">
+        <span class="shop-page-eyebrow">THE N9 &amp; BTZ — Stream Stats</span>
+        <h1 id="stats-name">Loading…</h1>
+        <span class="live-status" id="stats-live" data-slug="" hidden>Offline</span>
+        <p id="stats-bio" class="stats-hero-bio"></p>
+        <a id="stats-kick-link" class="kick-link" href="#" target="_blank" rel="noopener">kick.com →</a>
+      </div>
+    </div>
+
+    <div class="stat-bars-card">
+      <div class="stat-bars-head">
+        <span class="stat-bars-title">Top numbers</span>
+        <span class="stat-bars-sub">Auto-updates every 45s where marked live</span>
+      </div>
+      <div id="stat-bars-list" class="stat-bars-list"></div>
+    </div>
+  </main>
+
+  <script src="/stats.js"></script>
+</body>
+</html>
