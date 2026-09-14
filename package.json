@@ -2,10 +2,18 @@
   "name": "n9btz-site",
   "version": "1.0.0",
   "private": true,
-  "description": "THE N9 & BTZ — static site + Vercel serverless functions (admin panel, database, photo upload).",
+  "description": "THE N9 & BTZ — static site + Express API (admin panel, database, photo upload), for Render.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
-    "@vercel/blob": "^2.8.0",
-    "cookie": "^0.7.2"
+    "cloudinary": "^2.5.1",
+    "cookie": "^0.7.2",
+    "express": "^4.21.2"
   }
 }
