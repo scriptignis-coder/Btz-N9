@@ -1080,13 +1080,10 @@ section {
   margin: 0 0 18px;
 }
 
-.shop-page-col ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.shop-product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
 }
 
 .shop-page-empty {
@@ -1094,105 +1091,156 @@ section {
   font-size: 0.88rem;
 }
 
-.item {
+.shop-empty-state {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 3px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  gap: 8px;
+  padding: 32px 16px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 4px;
+  text-align: center;
 }
 
-.item:hover {
-  border-color: var(--accent-2);
-  transform: translateX(2px);
-}
-
-.item-out {
-  opacity: 0.6;
-}
-
-.item-thumb {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 auto;
-  border-radius: 3px;
-  overflow: hidden;
-  background: var(--bg-elevated);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.66rem;
+.shop-empty-state .icon {
+  width: 26px;
+  height: 26px;
   color: var(--text-faint);
 }
 
-.item-thumb img {
+.shop-empty-state p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.shop-empty-state span {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.shop-product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.shop-product-card:hover {
+  border-color: var(--accent-2);
+  transform: translateY(-3px);
+}
+
+.shop-product-card.is-out {
+  opacity: 0.6;
+}
+
+.shop-product-photo {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  overflow: hidden;
+  background: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+}
+
+.shop-product-photo img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.3s ease;
 }
 
-.item:hover .item-thumb img {
-  transform: scale(1.1);
+.shop-product-card:hover .shop-product-photo img {
+  transform: scale(1.05);
 }
 
-.item-info {
-  flex: 1;
-  min-width: 0;
+.shop-product-placeholder {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: color-mix(in srgb, var(--bg) 30%, transparent);
+}
+
+.shop-product-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 3px;
+  color: var(--accent-ink);
+  background: var(--accent-strong);
+}
+
+.shop-product-badge.out {
+  background: var(--danger);
+  color: #1a0a08;
+}
+
+.shop-product-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  padding: 0 2px 4px;
 }
 
-.item-name {
-  font-size: 0.92rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.item-price {
+.shop-product-meta {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  font-variant-numeric: tabular-nums;
+  font-size: 0.64rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.shop-product-name {
+  margin: 0;
+  font-family: 'Libre Franklin', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.shop-product-price {
+  margin-top: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--text);
   display: flex;
   align-items: baseline;
   gap: 8px;
+  font-variant-numeric: tabular-nums;
 }
 
 .item-price-was {
   color: var(--danger);
   text-decoration-color: var(--danger);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
 }
 
 .item-price-promo {
   color: var(--accent-strong);
-  font-size: 0.9rem;
+  font-size: 0.98rem;
 }
 
-.tag {
-  flex: 0 0 auto;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.64rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  border: 1px solid var(--border-strong);
-  border-radius: 3px;
-  padding: 4px 8px;
-  color: var(--text-muted);
-  background: transparent;
-  cursor: default;
-}
-
-.tag.out {
-  color: var(--danger);
-  border-color: var(--danger);
+@media (max-width: 520px) {
+  .shop-product-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
 }
 
 /* ---------- Moments (behind the scenes) ---------- */

@@ -17,26 +17,31 @@
     return dt + ' DT';
   }
 
-  function itemHtml(p) {
+  function itemHtml(p, categoryLabel) {
     var thumb = p.photo_url
       ? '<img src="' + escapeHtml(p.photo_url) + '" alt="' + escapeHtml(p.name) + '">'
-      : '<span aria-hidden="true">N9</span>';
+      : '<span class="shop-product-placeholder" aria-hidden="true">N9</span>';
     var price =
       p.promo_price != null
         ? '<s class="item-price-was">' + fmtPrice(p.price) + '</s><b class="item-price-promo">' + fmtPrice(p.promo_price) + '</b>'
         : fmtPrice(p.price);
-    var tag = p.in_stock ? 'In stock' : 'Out of stock';
-    var tagClass = p.in_stock ? 'tag' : 'tag out';
+    var badge =
+      p.promo_price != null
+        ? '<span class="shop-product-badge">Promo</span>'
+        : !p.in_stock
+        ? '<span class="shop-product-badge out">Out of stock</span>'
+        : '';
+    var genderLabel = p.gender === 'women' ? 'Women' : 'Men';
 
     return (
-      '<li class="item' + (p.in_stock ? '' : ' item-out') + '">' +
-      '<div class="item-thumb">' + thumb + '</div>' +
-      '<div class="item-info">' +
-      '<span class="item-name">' + escapeHtml(p.name) + '</span>' +
-      '<span class="item-price">' + price + '</span>' +
+      '<div class="shop-product-card' + (p.in_stock ? '' : ' is-out') + '">' +
+      '<div class="shop-product-photo">' + thumb + badge + '</div>' +
+      '<div class="shop-product-info">' +
+      '<span class="shop-product-meta">' + escapeHtml(categoryLabel) + ' · ' + genderLabel + '</span>' +
+      '<h3 class="shop-product-name">' + escapeHtml(p.name) + '</h3>' +
+      '<div class="shop-product-price">' + price + '</div>' +
       '</div>' +
-      '<span class="' + tagClass + '">' + tag + '</span>' +
-      '</li>'
+      '</div>'
     );
   }
 
@@ -65,16 +70,16 @@
         var menList = document.getElementById('men-list');
         var womenList = document.getElementById('women-list');
 
-        menList.innerHTML = men.map(itemHtml).join('');
-        womenList.innerHTML = women.map(itemHtml).join('');
+        menList.innerHTML = men.map(function (p) { return itemHtml(p, label); }).join('');
+        womenList.innerHTML = women.map(function (p) { return itemHtml(p, label); }).join('');
 
-        document.getElementById('men-empty').style.display = men.length ? 'none' : 'block';
-        document.getElementById('women-empty').style.display = women.length ? 'none' : 'block';
+        document.getElementById('men-empty').style.display = men.length ? 'none' : 'flex';
+        document.getElementById('women-empty').style.display = women.length ? 'none' : 'flex';
       })
       .catch(function () {
         document.getElementById('db-error').style.display = 'block';
-        document.getElementById('men-empty').style.display = 'block';
-        document.getElementById('women-empty').style.display = 'block';
+        document.getElementById('men-empty').style.display = 'flex';
+        document.getElementById('women-empty').style.display = 'flex';
       });
   }
 
